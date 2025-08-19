@@ -1,20 +1,24 @@
 import express from 'express'
 import connectDB from './configs/db.js'
 import dotenv from 'dotenv'
+import http from "http";
+import app from "./app.js";
+import { initIO } from "./sockets/io.js";
 
 
 
-const app=express();
-dotenv.config();
-// add middleware
-app.use(express.json());
-app.use(express.urlencoded({extended:true}))
 
-const PORT=process.env.PORT;
+
+
+
 
 //conectthe database 
-connectDB().then(()=>{
-app.listen(PORT,()=>{
-    console.log(`🚀 Server running on port ${PORT}`);
-})
-})
+const start = async () => {
+  await connectDB();
+  const server = http.createServer(app);
+  initIO(server);
+  const port = process.env.PORT || 5000;
+  server.listen(port, () => console.log(`🚀 Server running on http://localhost:${port}`));
+};
+
+start();
